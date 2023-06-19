@@ -65,32 +65,30 @@ Badass Todo
 <script setup>
 import {ref, onMounted} from 'vue';
 import {v4 as uuidv4} from 'uuid';
-import {collection,getDocs} from 'firebase/firestore'
+import {collection,getDocs, onSnapshot, QuerySnapshot} from 'firebase/firestore'
 import {db} from '../src/firebase/index'
 const todos=ref([
-  {
-    id:'id1',
-    content:'Shave my butt',
-    done:false
-  },
-  {
-    id:'id2',
-    content:'Wash my butt',
-    done:true
-  }
+
  
 ])
 /**
  * getTodos
  */
 onMounted(() => {
-  const querySnapshot = await getDocs(collection(db,"cities"));
-  querySnapshot.forEach((doc) =>{
-   console.log(doc.id, "=>", doc.data())
-  })
 
 
-
+onSnapshot(collection(db,'todos'),(querySnapshot) => {
+  const fbTodos =[];
+  querySnapshot.forEach((doc) => {
+    const todo ={
+      id:doc.id,
+      content:doc.data().content,
+      done:doc.data().done
+    }
+    fbTodos.push(todo)
+  });
+  todos.value=fbTodos
+})
 })
 
 const newTodoContent = ref('')
