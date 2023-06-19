@@ -64,8 +64,12 @@ Badass Todo
 
 <script setup>
 import {ref, onMounted} from 'vue';
-import {collection,getDocs, onSnapshot, QuerySnapshot, addDoc} from 'firebase/firestore'
+import {doc,collection,getDocs, onSnapshot, QuerySnapshot, updateDoc, addDoc, deleteDoc} from 'firebase/firestore'
 import {db} from '../src/firebase/index'
+/***
+ * firebase refs
+ */
+const todosCollectionRef= collection(db,'todos')
 const todos=ref([
 
  
@@ -94,7 +98,7 @@ const newTodoContent = ref('')
 
 const addTodo = () => {
 
-  addDoc(collection(db,'todos'),{
+  addDoc(collection(todosCollectionRef,'todos'),{
   content:newTodoContent.value,
   done:false
 
@@ -106,7 +110,7 @@ newTodoContent.value =''
  * delete todo
  */
 const deleteToDo = id =>{
- todos.value = todos.value.filter(todo => todo.id !== id )
+ deleteDoc(doc(todosCollectionRef,id))
 }
 /**
  * toggle done
@@ -116,6 +120,10 @@ const toggleDone = id => {
   const index= todos.value.findIndex(todo => todo.id === id)
   console.log('index',index)
   todos.value[index].done = !todos.value[index].done
+  
+  updateDoc(doc(todosCollectionRef,id),{
+    done:!todos.value[index].done
+  })
 }
 </script>
 
