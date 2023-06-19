@@ -64,23 +64,31 @@ Badass Todo
 
 <script setup>
 import {ref, onMounted} from 'vue';
-import {doc,collection,getDocs, onSnapshot, QuerySnapshot, updateDoc, addDoc, deleteDoc} from 'firebase/firestore'
+import {
+  doc,collection,
+  query,orderBy, 
+  limit, getDocs, 
+  onSnapshot, QuerySnapshot, 
+  updateDoc, addDoc, 
+  deleteDoc
+   }
+   from 'firebase/firestore'
 import {db} from '../src/firebase/index'
+
 /***
  * firebase refs
  */
 const todosCollectionRef= collection(db,'todos')
-const todos=ref([
+const todosCollectionQuery= query(todosCollectionRef, orderBy("date",'asc'))
 
- 
-])
+const todos=ref([])
 /**
  * getTodos
  */
 onMounted(() => {
 
 
-onSnapshot(collection(db,'todos'),(querySnapshot) => {
+onSnapshot(todosCollectionQuery,(querySnapshot) => {
   const fbTodos =[];
   querySnapshot.forEach((doc) => {
     const todo ={
@@ -98,9 +106,10 @@ const newTodoContent = ref('')
 
 const addTodo = () => {
 
-  addDoc(collection(todosCollectionRef,'todos'),{
+  addDoc(todosCollectionRef,{
   content:newTodoContent.value,
-  done:false
+  done:false, 
+  date:Date.now()
 
 })
 newTodoContent.value =''
@@ -119,7 +128,6 @@ const toggleDone = id => {
   console.log('toggleDone',id)
   const index= todos.value.findIndex(todo => todo.id === id)
   console.log('index',index)
-  todos.value[index].done = !todos.value[index].done
   
   updateDoc(doc(todosCollectionRef,id),{
     done:!todos.value[index].done
