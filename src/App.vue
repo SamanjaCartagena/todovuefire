@@ -64,8 +64,7 @@ Badass Todo
 
 <script setup>
 import {ref, onMounted} from 'vue';
-import {v4 as uuidv4} from 'uuid';
-import {collection,getDocs, onSnapshot, QuerySnapshot} from 'firebase/firestore'
+import {collection,getDocs, onSnapshot, QuerySnapshot, addDoc} from 'firebase/firestore'
 import {db} from '../src/firebase/index'
 const todos=ref([
 
@@ -94,12 +93,12 @@ onSnapshot(collection(db,'todos'),(querySnapshot) => {
 const newTodoContent = ref('')
 
 const addTodo = () => {
- const newTodo ={
-  id:uuidv4(),
-  content: newTodoContent.value,
+
+  addDoc(collection(db,'todos'),{
+  content:newTodoContent.value,
   done:false
- }
-todos.value.unshift(newTodo)
+
+})
 newTodoContent.value =''
 
 }
